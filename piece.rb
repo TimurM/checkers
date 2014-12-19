@@ -34,8 +34,6 @@ class Piece
   end
 
   def render
-    p self.king
-    p self.color
     if color == :White && king == true
       "♔"
     elsif color == :White
@@ -136,6 +134,42 @@ class Piece
       return false
     end
   end
+
+  def valid_move_seq?(array)
+    board_copy = board.dup
+    begin
+      board_copy[pos].perform_moves!(array)
+    rescue InvalidMoveError => e
+      puts "Error was: #{e}"
+      false
+    end
+    true
+  end
+
+  def perform_moves(array)
+
+    if array.length < 2
+      perform_slide(array.first)
+      perform_jump(array.first)
+    elsif array.length >= 1
+
+      if valid_move_seq?(array)
+        perform_moves!(array)
+      else
+        raise InvalidMoveError.new "Invalid sequence -- too short"
+      end
+    end
+  end
+
+  def perform_moves!(array)
+
+    array.each {|el| perform_jump(el)}
+  end
+
+end
+
+class InvalidMoveError < StandardError
+
 end
 
 class InvalidMove<StandardError
